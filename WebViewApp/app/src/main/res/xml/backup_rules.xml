@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Nunca incluir los SharedPreferences cifrados en el backup automático,
+         porque la clave maestra del Keystore no se restaura en otro dispositivo. -->
+    <exclude domain="sharedpref" path="secure_session_prefs.xml" />
+</full-backup-content>
