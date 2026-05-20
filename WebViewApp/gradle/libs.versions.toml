@@ -13,6 +13,7 @@ retrofitKotlinxSerialization = "1.0.0"
 coroutines = "1.9.0"
 webkit = "1.12.1"
 splashscreen = "1.0.1"
+navigationCompose = "2.8.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,9 @@ androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "w
 
 # Splash screen oficial de Android 12+ (compatible hacia atrás)
 androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
+
+# Navigation Compose: NavHost para single-Activity
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 # Networking: Retrofit + OkHttp + kotlinx.serialization
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }

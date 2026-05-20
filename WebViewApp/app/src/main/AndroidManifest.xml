@@ -30,18 +30,13 @@
             </intent-filter>
         </activity>
 
-        <!-- Login con Jetpack Compose -->
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- WebView principal -->
+        <!-- Activity única: aloja un NavHost con Login y WebView -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize" />
 
     </application>
 

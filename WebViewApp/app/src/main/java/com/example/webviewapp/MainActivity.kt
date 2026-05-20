@@ -1,13 +1,13 @@
 package com.example.webviewapp
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.webviewapp.data.SessionManager
+import com.example.webviewapp.ui.navigation.AppNavHost
+import com.example.webviewapp.ui.navigation.Routes
 import com.example.webviewapp.ui.theme.WebViewAppTheme
-import com.example.webviewapp.ui.webview.WebViewScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -17,32 +17,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val token = sessionManager.getToken()
+        val startDestination = intent.getStringExtra(EXTRA_START_DESTINATION)
+            ?: if (sessionManager.hasToken()) Routes.WEBVIEW else Routes.LOGIN
 
         setContent {
             WebViewAppTheme {
-                WebViewScreen(
-                    url = TARGET_URL,
-                    authToken = token,
-                    onLogout = {
-                        sessionManager.clearSession()
-                        startActivity(
-                            Intent(this, LoginActivity::class.java).apply {
-                                addFlags(
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or
-                                    Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                )
-                            }
-                        )
-                        finish()
-                    }
+                AppNavHost(
+                    sessionManager = sessionManager,
+                    targetUrl = TARGET_URL,
+                    startDestination = startDestination
                 )
             }
         }
     }
 
     companion object {
-        // URL solicitada en el enunciado
+        const val EXTRA_START_DESTINATION = "extra_start_destination"
         private const val TARGET_URL = "https://tu-sitio-web.com"
     }
 }
