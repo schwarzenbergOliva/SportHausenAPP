@@ -1,0 +1,28 @@
+# Gradle
+.gradle/
+build/
+**/build/
+!**/src/**/build/
+
+# Kotlin compiler cache
+.kotlin/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.cxx/
+captures/
+
+# Local SDK / signing config (machine-specific)
+local.properties
+keystore.properties
+*.jks
+*.keystore
+
+# Logs y temporales
+*.log
+hs_err_pid*
+
+# OS
+.DS_Store
+Thumbs.db
