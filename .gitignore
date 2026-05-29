@@ -26,3 +26,6 @@ hs_err_pid*
 # OS
 .DS_Store
 Thumbs.db
+
+# Notas locales de sesión (no son parte del proyecto)
+SESSION_NOTES.md
