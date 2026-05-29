@@ -6,8 +6,9 @@ import java.io.IOException
 /**
  * Repositorio de autenticación contra el backend SportHausen.
  *
- * Devuelve `Result<T>` con excepciones tipadas (AuthException) para que el
- * ViewModel pueda mostrar mensajes específicos según la causa del fallo.
+ * Las respuestas del backend vienen con el envoltorio
+ * `{ success, data: { authToken, user }, message, error }`. Aquí extraemos
+ * el `authToken` y mapeamos errores HTTP a `AuthException` tipadas.
  */
 class AuthRepository(
     private val api: ApiService = RetrofitClient.api
@@ -15,26 +16,38 @@ class AuthRepository(
 
     suspend fun login(email: String, password: String): Result<String> = safeCall {
         val response = api.login(LoginRequest(email = email.trim(), password = password))
-        require(response.authToken.isNotBlank()) { "El servidor no devolvió un token válido." }
-        response.authToken
+        extractToken(response)
     }
 
     suspend fun signup(name: String, email: String, password: String): Result<String> = safeCall {
         val response = api.signup(
             SignupRequest(name = name.trim(), email = email.trim(), password = password)
         )
-        require(response.authToken.isNotBlank()) { "El servidor no devolvió un token válido." }
-        response.authToken
+        extractToken(response)
     }
 
     /** Cierra la sesión en el backend (best-effort). Si falla, el cliente igual borra su token. */
-    suspend fun logout(): Result<Unit> = safeCall { api.logout() }
+    suspend fun logout(): Result<Unit> = safeCall { api.logout(); Unit }
 
-    /** Verifica que el token actual sigue siendo válido. */
-    suspend fun me(): Result<User> = safeCall { api.me() }
+    /**
+     * Extrae authToken validando el envelope. Si success=false o data viene null,
+     * lanza para que safeCall lo capture y mapee a un error de UI.
+     */
+    private fun extractToken(envelope: AuthEnvelope): String {
+        if (!envelope.success || envelope.data == null) {
+            throw AuthException.Generic(
+                envelope.error ?: envelope.message ?: "Respuesta inválida del servidor"
+            )
+        }
+        val token = envelope.data.authToken
+        require(token.isNotBlank()) { "El servidor no devolvió un token válido." }
+        return token
+    }
 
     private inline fun <T> safeCall(block: () -> T): Result<T> = try {
         Result.success(block())
+    } catch (e: AuthException) {
+        Result.failure(e)
     } catch (e: HttpException) {
         Result.failure(mapHttpError(e))
     } catch (e: IOException) {

@@ -19,7 +19,7 @@ data class LoginUiState(
     val loginSuccess: Boolean = false
 ) {
     val isFormValid: Boolean
-        get() = email.contains("@") && password.length >= 6
+        get() = email.contains("@") && password.length >= 8
 }
 
 class LoginViewModel(app: Application) : AndroidViewModel(app) {
