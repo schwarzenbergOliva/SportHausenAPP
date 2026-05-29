@@ -14,7 +14,7 @@ import android.webkit.WebViewClient
  */
 class SecureWebViewClient(
     private val allowedHost: String,
-    private val onPageStarted: () -> Unit = {},
+    private val onPageStarted: (WebView?) -> Unit = {},
     private val onPageFinished: () -> Unit = {},
     private val onError: (code: Int, description: String) -> Unit = { _, _ -> }
 ) : WebViewClient() {
@@ -31,7 +31,7 @@ class SecureWebViewClient(
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
-        onPageStarted()
+        onPageStarted(view)
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {

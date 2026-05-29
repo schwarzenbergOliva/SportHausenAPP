@@ -15,11 +15,19 @@ object Routes {
     const val WEBVIEW = "webview"
 }
 
+/**
+ * Grafo de navegación de la app.
+ *
+ * @param onLogoutRequested side-effects que ocurren al cerrar sesión
+ *   (llamar al endpoint /auth/logout, borrar el token cifrado). El NavHost se
+ *   limita a la navegación; las consecuencias persistentes vienen de fuera.
+ */
 @Composable
 fun AppNavHost(
     sessionManager: SessionManager,
     targetUrl: String,
     startDestination: String,
+    onLogoutRequested: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
@@ -44,7 +52,7 @@ fun AppNavHost(
                 url = targetUrl,
                 authToken = sessionManager.getToken(),
                 onLogout = {
-                    sessionManager.clearSession()
+                    onLogoutRequested()
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(Routes.WEBVIEW) { inclusive = true }
                         launchSingleTop = true
