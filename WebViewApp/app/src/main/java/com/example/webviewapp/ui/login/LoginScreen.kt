@@ -39,15 +39,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.webviewapp.ui.components.AppLogo
 import com.example.webviewapp.ui.components.BrandBackground
+import com.example.webviewapp.ui.components.BrandLogoPlate
 import com.example.webviewapp.ui.theme.BrandCoral
 
 @Composable
@@ -78,18 +77,9 @@ fun LoginScreen(
         ) {
             Spacer(Modifier.height(48.dp))
 
-            AppLogo(size = 104.dp)
+            BrandLogoPlate()
 
-            Spacer(Modifier.height(16.dp))
-
-            Text(
-                text = "SportHausen",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
-            )
-
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(20.dp))
 
             Text(
                 text = "Ingresa tus credenciales para continuar",
