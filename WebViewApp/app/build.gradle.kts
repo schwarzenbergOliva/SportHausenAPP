@@ -10,7 +10,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.webviewapp"
+        applicationId = "app.sporthausen"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -20,6 +20,17 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // URLs configurables (sobreescribibles en gradle.properties):
+        //   BACKEND_BASE_URL  -> backend Node/Express (login nativo)
+        //   FRONTEND_BASE_URL -> web React que carga el WebView
+        // Por defecto apuntan al host del EMULADOR (10.0.2.2 = localhost del PC).
+        val backendBaseUrl = (project.findProperty("BACKEND_BASE_URL") as String?)
+            ?: "http://10.0.2.2:3000"
+        val frontendBaseUrl = (project.findProperty("FRONTEND_BASE_URL") as String?)
+            ?: "http://10.0.2.2:5173"
+        buildConfigField("String", "BACKEND_BASE_URL", "\"$backendBaseUrl\"")
+        buildConfigField("String", "FRONTEND_BASE_URL", "\"$frontendBaseUrl\"")
     }
 
     buildTypes {
@@ -74,7 +85,7 @@ dependencies {
     // Seguridad: EncryptedSharedPreferences
     implementation(libs.androidx.security.crypto)
 
-    // WebView mejorado (API moderna sobre CookieManager y configuración)
+    // WebView moderno (inyección de localStorage antes de cargar la SPA)
     implementation(libs.androidx.webkit)
 
     // Networking
@@ -85,4 +96,8 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+
+    // Tests (JVM)
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

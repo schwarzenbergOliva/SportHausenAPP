@@ -1,67 +1,61 @@
-# WebViewApp
+# SportHausen App (Android)
 
-App Android nativa en Kotlin con flujo:
+App Android nativa (Kotlin 2.1 + Jetpack Compose) que hace **login nativo** y
+luego carga la **web React** dentro de un `WebView`, ya con la sesión activa.
 
 ```
-SplashActivity ──► ¿hay token? ──► sí ─► MainActivity (WebView)
-                                  └── no ─► LoginActivity (Compose) ─► MainActivity
+SplashActivity ─► ¿hay token? ─► sí ─► MainActivity (WebView con la web logueada)
+                              └─ no ─► LoginActivity (Compose) ─► MainActivity
 ```
 
-## Stack
+## Arquitectura del sistema (3 capas)
 
-- **Kotlin 2.1** + **Jetpack Compose** (BOM 2024.12)
-- **EncryptedSharedPreferences** (Tink + Keystore) para el token
-- **Retrofit 2** + **kotlinx.serialization** para el placeholder de API
-- **AndroidX WebKit** para configuración moderna del WebView
-- `minSdk 24`, `targetSdk 35`
-
-## Cómo correr
-
-1. Abrir con Android Studio Iguana o superior.
-2. `File → Sync Project with Gradle Files`.
-3. Run en un emulador con API 24+.
-
-Por defecto el login funciona en **modo simulado** (acepta cualquier email con `@`
-y password de 6+ caracteres y devuelve un token UUID). Para activar Retrofit
-contra tu backend real:
-
-1. Edita `RetrofitClient.kt` y pon tu `BASE_URL`.
-2. En `AuthRepository.kt` cambia `USE_FAKE_AUTH = false`.
-
-## Puntos clave de implementación
-
-### 1. Token cifrado
-`data/SessionManager.kt` envuelve `EncryptedSharedPreferences` con `MasterKey`
-(API actual, no la deprecated `MasterKeys`). La clave maestra vive en el Keystore.
-
-### 2. Cookie injection en el WebView
-En `ui/webview/WebViewScreen.kt`, dentro de `LaunchedEffect`:
-
-```kotlin
-CookieManager.getInstance().apply {
-    setAcceptCookie(true)
-    setCookie(url, "session_token=$authToken; Path=/; Secure; SameSite=Lax")
-    flush()                       // ⚠ obligatorio antes de loadUrl
-}
+```
+App Android ──login──► Backend Node/Express (BFF) ──► Xano (BaaS + datos)
+     │                         (normaliza roles)
+     └─ inyecta sesión en localStorage ─► WebView ─► Frontend React (SPA)
 ```
 
-El orden importa: `setCookie → flush → loadUrl`. Sin `flush()` el WebView puede
-hacer el primer request antes de que la cookie esté persistida.
+## Hand-off de sesión (lo importante)
 
-### 3. Back button → historial del WebView
-```kotlin
-BackHandler(enabled = webViewRef?.canGoBack() == true) {
-    webViewRef?.goBack()
-}
+La web guarda la sesión en `localStorage` con **4 claves**: `authToken`, `user`
+(JSON), `userType` (rol) y `userId`. Tras el login nativo, la app obtiene esos
+datos del backend y los **inyecta en `localStorage` antes de que arranque la SPA**
+con `WebViewCompat.addDocumentStartJavaScript`. Así React monta ya autenticado y
+redirige al dashboard del rol:
+
+- `luchador`  → `/panel/luchador`
+- `booker`    → `/dashboard/booker`
+- `agrupacion`→ `/dashboard/agrupacion`
+
+## Configuración (URLs)
+
+En `gradle.properties` (o por defecto apuntan al **emulador**, `10.0.2.2`):
+
+```properties
+BACKEND_BASE_URL=http://10.0.2.2:3000      # backend Node/Express
+FRONTEND_BASE_URL=http://10.0.2.2:5173     # web React (Vite dev)
 ```
-Cuando `canGoBack()` devuelve false, el `BackHandler` se desactiva y el sistema
-gestiona el back normalmente (sale de la activity).
 
-### 4. Progress indicator durante la carga
-`WebChromeClient.onProgressChanged()` actualiza un `mutableFloatStateOf` que
-pinta un `LinearProgressIndicator` en Compose. Esto cubre el gap entre "HTML
-descargado" y "CSS aplicado".
+> En producción, ambos deben servirse por **HTTPS** y se cambian estas dos URLs.
+> El `network_security_config.xml` solo permite HTTP (cleartext) hacia
+> `10.0.2.2`/`localhost` para desarrollo.
 
-### 5. Splash sin parpadeo
-`SplashActivity` usa el SplashScreen API oficial y decide en `onCreate()` —
-antes de `setContent` — a qué activity ir.
+## Cómo probar (emulator-first)
+
+1. Levanta el **backend Node** en tu PC (`npm run dev`, puerto 3000).
+2. Levanta el **frontend React** (`npm run dev`, Vite en 5173) apuntando su
+   `VITE_API_URL` al backend.
+3. Abre esta app en Android Studio y ejecútala en un **emulador** (API 24+).
+4. Login → la app inyecta la sesión y carga la web en el dashboard del rol.
+
+## Estructura
+
+```
+data/        SessionManager (sesión cifrada: 4 claves)
+network/     ApiService, AuthRepository, RetrofitClient, modelos del backend
+ui/login/    LoginScreen + LoginViewModel (login nativo)
+ui/webview/  WebViewScreen + SecureWebViewClient (hand-off + WebView)
+ui/components Branding (logo + fondo)
+ui/theme/    Material 3 theme
+```

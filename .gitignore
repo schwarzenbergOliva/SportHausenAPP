@@ -1,0 +1,11 @@
+# Editores / IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build / Gradle (por si se ejecuta desde la raíz)
+.gradle/
+build/

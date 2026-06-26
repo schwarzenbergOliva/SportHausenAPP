@@ -4,20 +4,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.example.webviewapp.network.SessionData
 
 /**
- * Encapsula el almacenamiento seguro del token de sesión.
- *
- * Usa EncryptedSharedPreferences sobre Tink. La clave maestra se guarda en
- * el Android Keystore (hardware-backed cuando el dispositivo lo soporta), por
- * lo que no es extraíble incluso con root. El esquema AES256_GCM cifra valores
- * y AES256_SIV deriva claves deterministas para los nombres (para permitir
- * lookups por key sin filtrar contenido).
- *
- * Nota: androidx.security:security-crypto está en estado "deprecated/alpha" según
- * la doc oficial más reciente. Para producción nueva, evaluar Tink + DataStore
- * o jetpack DataStore con cifrado manual. Para fines didácticos y de transición
- * sigue siendo perfectamente válido.
+ * Almacenamiento seguro de la sesión sobre EncryptedSharedPreferences (Tink +
+ * Android Keystore). Guarda las 4 piezas que el WebView debe inyectar en el
+ * localStorage de la web: authToken, user (JSON), userType (role) y userId.
  */
 class SessionManager(context: Context) {
 
@@ -35,11 +27,19 @@ class SessionManager(context: Context) {
         )
     }
 
-    fun saveToken(token: String) {
-        prefs.edit().putString(KEY_TOKEN, token).apply()
+    fun saveSession(session: SessionData) {
+        prefs.edit()
+            .putString(KEY_TOKEN, session.authToken)
+            .putString(KEY_USER, session.userJson)
+            .putString(KEY_USER_TYPE, session.userType)
+            .putString(KEY_USER_ID, session.userId)
+            .apply()
     }
 
     fun getToken(): String? = prefs.getString(KEY_TOKEN, null)
+    fun getUserJson(): String? = prefs.getString(KEY_USER, null)
+    fun getUserType(): String? = prefs.getString(KEY_USER_TYPE, null)
+    fun getUserId(): String? = prefs.getString(KEY_USER_ID, null)
 
     fun hasToken(): Boolean = !getToken().isNullOrBlank()
 
@@ -50,5 +50,8 @@ class SessionManager(context: Context) {
     companion object {
         private const val PREFS_FILENAME = "secure_session_prefs"
         private const val KEY_TOKEN = "auth_token"
+        private const val KEY_USER = "user_json"
+        private const val KEY_USER_TYPE = "user_type"
+        private const val KEY_USER_ID = "user_id"
     }
 }

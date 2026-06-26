@@ -10,13 +10,12 @@ import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 
 /**
- * Cliente Retrofit perezoso. Apuntar BASE_URL al backend real cuando lo tengas.
- * Por ahora cualquier llamada de red devolverá un error si no apuntas a una
- * URL válida; el LoginViewModel está preparado para usar el modo simulado.
+ * Cliente Retrofit perezoso apuntando al backend Node/Express.
+ * BASE_URL = BACKEND_BASE_URL + "/api/" (configurable en gradle.properties).
  */
 object RetrofitClient {
 
-    private const val BASE_URL = "https://tu-sitio-web.com/api/"
+    private val BASE_URL = BuildConfig.BACKEND_BASE_URL.trimEnd('/') + "/api/"
 
     private val json = Json {
         ignoreUnknownKeys = true

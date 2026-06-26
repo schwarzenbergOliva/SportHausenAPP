@@ -7,13 +7,15 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 
 /**
- * WebViewClient personalizado con:
- *  - manejo de errores que expone callbacks para mostrar UI nativa
- *  - bloqueo de navegación fuera del dominio permitido (refuerza la seguridad)
- *  - callbacks de start/finish para sincronizar la barra de progreso/loader
+ * WebViewClient con:
+ *  - restricción de navegación al host permitido (refuerza la seguridad)
+ *  - inyección de un script de arranque en onPageStarted (fallback cuando el
+ *    dispositivo no soporta DOCUMENT_START_SCRIPT)
+ *  - callbacks de start/finish/error para la UI nativa
  */
 class SecureWebViewClient(
     private val allowedHost: String,
+    private val startScript: String? = null,
     private val onPageStarted: () -> Unit = {},
     private val onPageFinished: () -> Unit = {},
     private val onError: (code: Int, description: String) -> Unit = { _, _ -> }
@@ -24,13 +26,16 @@ class SecureWebViewClient(
         request: WebResourceRequest
     ): Boolean {
         val host = request.url.host ?: return false
-        // Permite navegar dentro del dominio o subdominios; cualquier otra
-        // URL la dejamos al WebView y aquí podrías delegar a Custom Tabs.
-        return !host.endsWith(allowedHost)
+        // Permitir el host permitido y sus subdominios; bloquear el resto.
+        val allowed = host == allowedHost || host.endsWith(".$allowedHost")
+        return !allowed
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
+        // Fallback de inyección: si DOCUMENT_START_SCRIPT no está disponible,
+        // escribimos las claves lo antes posible (antes de que React monte).
+        startScript?.let { view?.evaluateJavascript(it, null) }
         onPageStarted()
     }
 
@@ -45,7 +50,6 @@ class SecureWebViewClient(
         error: WebResourceError
     ) {
         super.onReceivedError(view, request, error)
-        // Solo nos interesan los errores del recurso principal (no de subrecursos)
         if (request.isForMainFrame) {
             onError(error.errorCode, error.description?.toString().orEmpty())
         }

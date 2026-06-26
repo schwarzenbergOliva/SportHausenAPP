@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Mancuerna (dumbbell) centrada en la zona segura -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M36,50 L72,50 L72,58 L36,58 Z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M28,42 L36,42 L36,66 L28,66 Z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M20,47 L28,47 L28,61 L20,61 Z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M72,42 L80,42 L80,66 L72,66 Z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M80,47 L88,47 L88,61 L80,61 Z" />
+</vector>

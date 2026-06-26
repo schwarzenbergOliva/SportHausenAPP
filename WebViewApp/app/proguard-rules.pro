@@ -17,3 +17,14 @@
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
 }
+
+# OkHttp referencia dependencias opcionales (TLS providers) que no usamos.
+# Sin esto, R8 puede emitir warnings y abortar el build de release.
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**
+
+# Tink (usado por EncryptedSharedPreferences) referencia anotaciones errorprone
+# que no están presentes en runtime. Sin esto, R8 aborta el build de release.
+-dontwarn com.google.errorprone.annotations.**

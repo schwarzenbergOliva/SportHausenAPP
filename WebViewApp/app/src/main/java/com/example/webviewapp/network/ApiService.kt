@@ -4,11 +4,12 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 /**
- * Endpoints REST. Reemplaza la URL base en RetrofitClient cuando integres
- * el backend real.
+ * Endpoints del backend Node/Express. La BASE_URL se define en RetrofitClient
+ * a partir de BuildConfig.BACKEND_BASE_URL.
  */
 interface ApiService {
 
+    /** Login nativo: mismo endpoint que usa la web. */
     @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): LoginResponse
+    suspend fun login(@Body request: LoginRequest): LoginEnvelope
 }

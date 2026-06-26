@@ -13,6 +13,7 @@ retrofitKotlinxSerialization = "1.0.0"
 coroutines = "1.9.0"
 webkit = "1.12.1"
 splashscreen = "1.0.1"
+junit = "4.13.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,7 +33,7 @@ androidx-material-icons-extended = { group = "androidx.compose.material", name =
 # Almacenamiento cifrado para el token de sesión
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
 
-# WebView moderno (CookieManager, configuración segura)
+# WebView moderno (addDocumentStartJavaScript, WebSettingsCompat, etc.)
 androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
 
 # Splash screen oficial de Android 12+ (compatible hacia atrás)
@@ -46,6 +47,10 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+# Testing (JVM unit tests)
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

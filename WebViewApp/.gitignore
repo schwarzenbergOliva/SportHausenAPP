@@ -1,0 +1,24 @@
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Local config (rutas de la máquina, NO debe versionarse)
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Keystores y secretos
+*.jks
+*.keystore
+keystore.properties
+
+# Logs / OS
+*.log
+.DS_Store
+Thumbs.db

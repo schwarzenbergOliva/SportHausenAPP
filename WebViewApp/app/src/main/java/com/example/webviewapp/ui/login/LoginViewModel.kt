@@ -46,11 +46,9 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
 
         viewModelScope.launch {
             authRepository.login(current.email.trim(), current.password)
-                .onSuccess { token ->
-                    sessionManager.saveToken(token)
-                    _state.update {
-                        it.copy(isLoading = false, loginSuccess = true)
-                    }
+                .onSuccess { session ->
+                    sessionManager.saveSession(session)
+                    _state.update { it.copy(isLoading = false, loginSuccess = true) }
                 }
                 .onFailure { error ->
                     _state.update {

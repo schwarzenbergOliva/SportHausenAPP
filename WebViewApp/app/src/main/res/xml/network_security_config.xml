@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <!--
-        Solo permitimos tráfico cifrado. Si necesitaras HTTP en desarrollo,
-        añade un <domain-config cleartextTrafficPermitted="true"> con tu IP local.
+        Producción: solo tráfico cifrado (HTTPS).
+        Desarrollo: se permite cleartext (HTTP) SOLO hacia el host del emulador
+        (10.0.2.2 = localhost del PC) y localhost, para probar el backend/front
+        locales. En producción, ambos deben servirse por HTTPS y este bloque de
+        desarrollo puede eliminarse.
     -->
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>
     </base-config>
+
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+    </domain-config>
 </network-security-config>
